@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+	<title>Stock symbol to get details of the company</title>
+    <style>
+
+
+    </style>
+</head>
+<body>
+
+<h1 style="text-align:center;" class="my-2">Enter the Stock symbol to get details of the company</h1>
+
+
+<form class="row my-5" id="form">
+	{% csrf_token %}
+	<div class="col-md-2 "></div>
+  <div class="col-md-3 text-white ">
+    <label class="visually-hidden">Stock Symbol</label>
+	  <h5><input type="text" readonly class="form-control-plaintext"  value="Enter the Stock Symbol"></h5>
+  </div>
+  <div class="col-md-3">
+    <label for="symbol" class="visually-hidden">Password</label>
+    <input type="text" class="form-control" id="symbol" name="symbol"  placeholder="eg - RELIANCE">
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-success mb-3">Search</button>
+  </div>
+		<div class="col-md-2 "></div>
+
+</form>
+
+
+
+
+
+<div class="row" >
+    		<div class="col-md-1 "></div>
+
+    <div class="col-md-4 " style="margin:5em auto">
+        <p id="last_traded_price"></p>
+<p id="price_change_today"></p>
+<p id="percent_price_change_in_last_2_weeks"></p>
+
+    </div>
+    <div class="col-md-7 ">
+<canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+
+</div>
+
+
+    </div>
+
+
+</div>
+
+
+
+	<script src="https://code.jquery.com/jquery-3.5.1.js"
+		integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+			crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+
+	<script type="text/javascript">
+
+	$(document).on('submit','#form',function(e){
+		e.preventDefault();
+		$.ajax({
+			type:'POST',
+			url:'{% url "home1" %}',
+			data:
+			{
+				symbol:$("#symbol").val(),
+				csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+			},
+			success:function(data){
+                    const obj = JSON.parse(data);
+                    document.getElementById("last_traded_price").innerHTML = "Last Traded Price : " + obj.last_traded_price;
+                    document.getElementById("price_change_today").innerHTML = "Price Change Today : " + obj.price_change_today;
+                    document.getElementById("percent_price_change_in_last_2_weeks").innerHTML = "Percentage Price Change In Last 2 Weeks : " + obj.percent_price_change_in_last_2_weeks + " %";
+
+var xValues = obj.iocl_key;
+var yValues = obj.iocl_value;
+
+console.log(yValues);
+
+new Chart("myChart", {
+  type: "line",
+  data: {
+    labels: xValues,
+    datasets: [{
+      fill: false,
+      lineTension: 0,
+      backgroundColor: "rgba(0,0,255,1.0)",
+      borderColor: "rgba(0,0,255,0.1)",
+      data: yValues
+    }]
+  },
+  options: {
+    legend: {display: false},
+
+  }
+});
+
+
+
+					}
+			})
+		});
+
+
+	</script>
+
+</body>
+</html>
+
+
